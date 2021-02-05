@@ -1,46 +1,44 @@
-from pygame import init, KEYDOWN, KEYUP, K_LEFT, K_a, K_RIGHT, K_d, K_UP, K_w, QUIT
-from pygame.display import set_caption, set_icon, set_mode, update
+from pygame import init 
+from pygame.locals import QUIT
+from pygame.display import set_caption, set_icon, set_mode, flip
+from pygame.time import Clock
 from pygame.draw import rect
 from pygame.event import get
 from pygame.image import load
+from pygame.key import get_pressed
+from pygame.sprite import Group
 import pygame
 from Player import Player
-
-# WIDTH, HEIGHT
-SIZE = (600, 600)
-# RED, GREEN, BLUE
-COLOR = (0, 0, 0)
-TITLE = "Fighting Game"
-ICON_PATH = "img/GameIcon.png"
+from game_const import SIZE, TITLE, ICON_PATH, COLOR, FPS
 
 init()
+
+clock = Clock()
 
 screen = set_mode(SIZE)
 set_caption(TITLE)
 set_icon(load(ICON_PATH))
 
-pl = Player(screen, 1, 15, 50, 50, (255, 255, 255))
-run = True
-while run:
+pl = Player(50, 50, (255, 255, 255))
+
+all_sprites = Group()
+all_sprites.add(pl)
+
+running = True
+while running:
   for event in get():
-    if event.type == QUIT: run = False
-    elif event.type == KEYDOWN:
-      if event.key == K_a or event.key == K_LEFT:
-        pl.mov_x = -1
-      elif event.key == K_d or event.key == K_RIGHT:  
-        pl.mov_x = 1
-      elif event.key == K_w or event.key == K_UP:
-        pl.mov_y = 0.1
-    elif event.type == KEYUP:
-      if (event.key == K_a or 
-          event.key == K_LEFT or
-          event.key == K_d or
-          event.key == K_RIGHT):
-        pl.mov_x = 0
-  
+      if event.type == QUIT:
+          running = False
+
+  pressed_keys = get_pressed()
+
+  pl.update(pressed_keys)
+
   screen.fill(COLOR)
-  pl.move_x()
-  pl.move_y()
-  pl.draw()
-  #pygame.Rect.move_ip(pl.rect, 0, 50)
-  update()
+
+  for s in all_sprites:
+    screen.blit(s.surf, s.rect)
+
+  flip()
+
+  clock.tick(FPS)
