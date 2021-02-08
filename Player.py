@@ -81,7 +81,9 @@ class Attack(Sprite):
         self.surf = Surface((width, height))
         self.surf.fill(color)
         self.rect = self.surf.get_rect()
-        self.rect.move_ip(parent.rect.right if facing else parent.rect.x, parent.rect.y)
+        self.rect.move_ip(
+            parent.rect.right if facing else (parent.rect.x - width), parent.rect.y
+        )
 
         self.speed = speed
         self.damage = damage
