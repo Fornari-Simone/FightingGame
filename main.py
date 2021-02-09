@@ -10,7 +10,7 @@ from pygame.locals import QUIT
 from pygame.image import load
 from pygame.time import Clock
 from pygame.event import get
-from Player import Player
+from Player import Attack, Player
 from pygame import init
 
 # endregion
@@ -53,8 +53,8 @@ udp = UDP_P2P("192.168.192.11", 6000, 6000)
 
 all_sprites = Group()
 
-pl = Player(50, 50, (255, 0, 0), all_sprites)
-pl2 = Player(50, 50, (0, 0, 255), all_sprites)
+pl = Player(50, 50, (255, 0, 0), 100, all_sprites)
+pl2 = Player(50, 50, (0, 0, 255), 100, all_sprites)
 all_sprites.add(pl)
 
 rcvT = udp.receptionThread(rcv, rcvErr)

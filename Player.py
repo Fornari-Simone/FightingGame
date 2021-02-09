@@ -13,7 +13,12 @@ from typing import Tuple
 
 class Player(Sprite):
     def __init__(
-        self, width: int, height: int, color: Tuple[int, int, int], sprite_list
+        self,
+        width: int,
+        height: int,
+        color: Tuple[int, int, int],
+        life: int,
+        sprite_list,
     ):
         super().__init__()
         self.surf = Surface((width, height))
@@ -24,6 +29,7 @@ class Player(Sprite):
         self.sprite_list = sprite_list
         self.lastAtk = 0
         self.facing = True
+        self.life = life
 
     def move_x(self, right):
         self.facing = right
@@ -53,7 +59,11 @@ class Player(Sprite):
             self.sprite_list.add(
                 RangedAttack(self, 20 if self.facing else -20, 10, 10, self.facing, 10)
             )
-
+            
+    def checkDmg(self):
+        atks = list(filter(lambda x: x.parent is not self, filter(lambda x: isinstance(x, Attack), self.sprite_list.sprites())))
+        print(atks)
+        
     def update(self, pressed_keys):
         self.apply_gravity()
         if pressed_keys[K_LEFT] or pressed_keys[K_a]:
@@ -64,6 +74,7 @@ class Player(Sprite):
             self.jump()
         if pressed_keys[K_z]:
             self.attack()
+        self.checkDmg()
 
 
 class Attack(Sprite):
@@ -84,7 +95,7 @@ class Attack(Sprite):
         self.rect.move_ip(
             parent.rect.right if facing else (parent.rect.x - width), parent.rect.y
         )
-
+        self.parent = parent
         self.speed = speed
         self.damage = damage
 
