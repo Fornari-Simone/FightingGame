@@ -1,6 +1,6 @@
 # region Imports
 
-from pygame.constants import KEYUP, K_LEFT, K_RIGHT, K_UP, K_a, K_d, K_w, K_z
+from pygame.constants import KEYUP, K_LEFT, K_RIGHT, K_UP, K_a, K_d, K_w, K_z, K_x
 from custom_udp import UDP_P2P
 from pygame.display import set_caption, set_icon, set_mode, flip
 from game_const import SIZE, TITLE, ICON_PATH, COLOR, FPS
@@ -26,6 +26,7 @@ def snd(keys):
             K_d: keys[K_d],
             K_w: keys[K_w],
             K_z: keys[K_z],
+            K_x: keys[K_x],
         }
     )
     udp.transmission("CBG", "01", "boh", msg)

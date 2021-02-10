@@ -55,9 +55,6 @@ class Player(Sprite):
 		if get_ticks() >= self.lastAtk + 500:
 			self.lastAtk = get_ticks()
 			self.sprite_list.add(MeleeAttack(self, 30, 45, self.facing, 10))
-			self.sprite_list.add(
-					RangedAttack(self, 20 if self.facing else -20, 10, 10, self.facing, 10)
-			)
 			
 	def ranged_attack(self):
 		if get_ticks() >= self.lastAtk + 500:
