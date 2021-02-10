@@ -15,7 +15,7 @@ class Player(Sprite):
 			width: int,
 			height: int,
 			color: Tuple[int, int, int],
-			life: int,
+			health: int,
 			sprite_list,
 	):
 			super().__init__()
@@ -27,7 +27,7 @@ class Player(Sprite):
 			self.sprite_list = sprite_list
 			self.lastAtk = 0
 			self.facing = True
-			self.life = life
+			self.health = health
 			self.color = color
 
 	def move_x(self, right):
@@ -65,13 +65,13 @@ class Player(Sprite):
 
 	def checkDmg(self):
 		atks = list(filter(lambda x: x.parent is not self, filter(lambda x: isinstance(x, Attack), self.sprite_list.sprites())))
-		
+
+		self.surf.fill(self.color)
 		for atk in atks:
 			if(collide_rect(self, atk)):
 				self.life -= atk.damage
+				atk.kill()
 				self.surf.fill((255, 0, 255))
-			else:
-				self.surf.fill(self.color)
 
 	def update(self, pressed_keys):
 			self.apply_gravity()
@@ -86,6 +86,24 @@ class Player(Sprite):
 			if pressed_keys[K_x]:
 					self.ranged_attack()
 			self.checkDmg()
+
+class HealthBar(Sprite):
+	def __init__(self, player: Player, maxHealth:int, x, y):
+		self.surfBg = Surface((100, 20))
+		self.rectBg = self.surfBg.get_rect()
+		self.surfBg.fill((0, 0, 0))
+		self.surfBar = Surface((100, 20))
+		self.surfBg.fill((255, 0, 0))
+		self.rectBar = self.surfBar.get_rect()
+		self.rectBg.move_ip(x, y)
+		self.rectBar.move_ip(x, y)
+
+		self.player = player
+		self.maxHealth = maxHealth
+	
+	def update(self, pressed_keys):
+		self.rectBar.width = (self.player.health / self.maxHealth) * 100
+
 
 
 class Attack(Sprite):

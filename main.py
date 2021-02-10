@@ -29,7 +29,7 @@ def snd(keys):
             K_x: keys[K_x],
         }
     )
-    udp.transmission("CBG", "01", "boh", msg)
+    udp.transmission("CBG", "01", "CeF", msg)
 
 
 def rcv(data, addr, port):
@@ -55,8 +55,10 @@ udp = UDP_P2P("192.168.192.67", 6000, 6000)
 all_sprites = Group()
 
 pl = Player(50, 50, (255, 0, 0), 100, all_sprites)
+plH = HealthBar(pl, pl.health, 10, 10)
 pl2 = Player(50, 50, (0, 0, 255), 100, all_sprites)
-all_sprites.add(pl)
+pl2H = HealthBar(pl2, pl2.health, SIZE[0] - 110, 10)
+all_sprites.add(pl, plH, pl2H)
 
 rcvT = udp.receptionThread(rcv, rcvErr)
 rcvT.start()
