@@ -69,7 +69,7 @@ class Player(Sprite):
 		self.surf.fill(self.color)
 		for atk in atks:
 			if(collide_rect(self, atk)):
-				self.life -= atk.damage
+				self.health -= atk.damage
 				atk.kill()
 				self.surf.fill((255, 0, 255))
 
@@ -89,6 +89,7 @@ class Player(Sprite):
 
 class HealthBar(Sprite):
 	def __init__(self, player: Player, maxHealth:int, x, y):
+		super().__init__()
 		self.surfBg = Surface((100, 20))
 		self.rectBg = self.surfBg.get_rect()
 		self.surfBg.fill((0, 0, 0))
