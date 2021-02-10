@@ -1,7 +1,5 @@
 # region Imports
-
-from pygame.constants import K_z
-from pygame.locals import K_LEFT, K_a, K_RIGHT, K_d, K_UP, K_w
+from pygame.locals import K_LEFT, K_a, K_RIGHT, K_d, K_UP, K_w, K_z, K_x
 from pygame.time import get_ticks
 from game_const import GRAVITY, SIZE, FPS, VEL_Y, VEL_X
 from pygame.sprite import Group, Sprite, collide_rect
@@ -53,23 +51,28 @@ class Player(Sprite):
 					self.rect.bottom = SIZE[1]
 					self.vel_y = 0
 
-	def attack(self):
-			if get_ticks() >= self.lastAtk + 500:
-					self.lastAtk = get_ticks()
-					self.sprite_list.add(MeleeAttack(self, 30, 45, self.facing, 10))
-					self.sprite_list.add(
-							RangedAttack(self, 20 if self.facing else -20, 10, 10, self.facing, 10)
-					)
-					
+	def melee_attack(self):
+		if get_ticks() >= self.lastAtk + 500:
+			self.lastAtk = get_ticks()
+			self.sprite_list.add(MeleeAttack(self, 30, 45, self.facing, 10))
+			self.sprite_list.add(
+					RangedAttack(self, 20 if self.facing else -20, 10, 10, self.facing, 10)
+			)
+			
+	def ranged_attack(self):
+		if get_ticks() >= self.lastAtk + 500:
+			self.lastAtk = get_ticks()
+			self.sprite_list.add(
+					RangedAttack(self, 20 if self.facing else -20, 10, 10, self.facing, 10)
+			)
+
 	def checkDmg(self):
 		atks = list(filter(lambda x: x.parent is not self, filter(lambda x: isinstance(x, Attack), self.sprite_list.sprites())))
-		print(atks)
 		
 		for atk in atks:
 			if(collide_rect(self, atk)):
 				self.life -= atk.damage
 				self.surf.fill((255, 0, 255))
-				print(atk.parent.life)
 			else:
 				self.surf.fill(self.color)
 
@@ -82,7 +85,9 @@ class Player(Sprite):
 			if pressed_keys[K_UP] or pressed_keys[K_w]:
 					self.jump()
 			if pressed_keys[K_z]:
-					self.attack()
+					self.melee_attack()
+			if pressed_keys[K_x]:
+					self.ranged_attack()
 			self.checkDmg()
 
 
