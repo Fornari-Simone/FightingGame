@@ -49,7 +49,7 @@ screen = set_mode(SIZE)
 set_caption(TITLE)
 set_icon(load(ICON_PATH))
 
-udp = UDP_P2P("192.168.192.11", 6000, 6000)
+udp = UDP_P2P("192.168.192.67", 6000, 6000)
 
 all_sprites = Group()
 
