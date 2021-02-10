@@ -92,7 +92,7 @@ class HealthBar(Sprite):
 		super().__init__()
 		self.surfBg = Surface((100, 20))
 		self.rectBg = self.surfBg.get_rect()
-		self.surfBg.fill((0, 0, 0))
+		self.surfBg.fill((10, 10, 10))
 		self.surfBar = Surface((100, 20))
 		self.surfBg.fill((255, 0, 0))
 		self.rectBar = self.surfBar.get_rect()

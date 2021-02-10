@@ -83,8 +83,8 @@ while running:
 
     screen.blit(plH.surfBar, plH.rectBar)
     screen.blit(plH.surfBg, plH.rectBg)
-    screen.blit(pl2H.surfBg, pl2H.rectBg)
     screen.blit(pl2H.surfBar, pl2H.rectBar)
+    screen.blit(pl2H.surfBg, pl2H.rectBg)
     screen.blit(pl2.surf, pl2.rect)
 
     flip()
