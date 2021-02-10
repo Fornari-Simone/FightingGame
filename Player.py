@@ -3,7 +3,6 @@ from pygame.locals import K_LEFT, K_a, K_RIGHT, K_d, K_UP, K_w, K_z, K_x
 from pygame.time import get_ticks
 from game_const import GRAVITY, SIZE, FPS, VEL_Y, VEL_X
 from pygame.sprite import Group, Sprite, collide_rect
-from pygame.transform import scale
 from pygame import Surface
 from typing import Tuple
 
@@ -95,7 +94,7 @@ class HealthBar(Sprite):
 		self.rectBg = self.surfBg.get_rect()
 		self.surfBg.fill((10, 10, 10))
 		self.surfBar = Surface((100, 20))
-		self.surfBg.fill((255, 0, 0))
+		self.surfBar.fill((255, 0, 0))
 		self.rectBar = self.surfBar.get_rect()
 		self.rectBg.move_ip(x, y)
 		self.rectBar.move_ip(x, y)
@@ -104,7 +103,7 @@ class HealthBar(Sprite):
 		self.maxHealth = maxHealth
 	
 	def update(self, pressed_keys):
-		self.surfBar = scale(self.surfBar, ((self.player.health / self.maxHealth) * 100), 20)
+		self.rectBar.width = (self.player.health / self.maxHealth) * 100
 
 
 
