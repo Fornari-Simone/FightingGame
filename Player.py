@@ -63,6 +63,7 @@ class Player(Sprite):
     def checkDmg(self):
         atks = list(filter(lambda x: x.parent is not self, filter(lambda x: isinstance(x, Attack), self.sprite_list.sprites())))
         print(atks)
+        print(atks[0].parent.color)
         
     def update(self, pressed_keys):
         self.apply_gravity()
