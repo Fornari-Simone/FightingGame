@@ -103,6 +103,7 @@ class HealthBar(Sprite):
 		self.maxHealth = maxHealth
 	
 	def update(self, pressed_keys):
+		(self.player.health / self.maxHealth) * 100
 		self.rectBar.width = (self.player.health / self.maxHealth) * 100
 
 
