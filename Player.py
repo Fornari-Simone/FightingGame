@@ -70,7 +70,7 @@ class Player(Sprite):
 				self.life -= atk.damage
 				self.surf.fill((255, 0, 255))
 				print(atk.parent.life)
-		    else:
+			else:
 				self.surf.fill(self.color)
 
 	def update(self, pressed_keys):
