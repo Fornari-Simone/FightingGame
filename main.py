@@ -81,10 +81,10 @@ while running:
     for s in all_sprites:
         screen.blit(s.surf, s.rect)
 
-    screen.blit(plH.surfBar, plH.rectBar)
     screen.blit(plH.surfBg, plH.rectBg)
-    screen.blit(pl2H.surfBar, pl2H.rectBar)
+    screen.blit(plH.surfBar, plH.rectBar)
     screen.blit(pl2H.surfBg, pl2H.rectBg)
+    screen.blit(pl2H.surfBar, pl2H.rectBar)
     screen.blit(pl2.surf, pl2.rect)
 
     flip()
