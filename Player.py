@@ -1,166 +1,214 @@
 # region Imports
+from pygame.constants import RLEACCEL
 from pygame.locals import K_LEFT, K_a, K_RIGHT, K_d, K_UP, K_w, K_z, K_x
 from pygame.time import get_ticks
 from game_const import GRAVITY, SIZE, FPS, VEL_Y, VEL_X
 from pygame.sprite import Group, Sprite, collide_rect
 from pygame.transform import scale
+from pygame.image import load
 from pygame import Surface
 from typing import Tuple
+from enum import Enum
 
 # endregion
 
+class AnimationStates(Enum):
+    IDLE = 0
+    MOVE = 1
+    JUMPUP = 3
+    JUMPDOWN = 4
+    ATTACK = 5
 
 class Player(Sprite):
-	def __init__(
-			self,
-			width: int,
-			height: int,
-			color: Tuple[int, int, int],
-			health: int,
-			sprite_list,
-	):
-			super().__init__()
-			self.surf = Surface((width, height))
-			self.surf.fill(color)
-			self.vel_y = 0
-			self.rect = self.surf.get_rect()
-			self.rect.bottom = SIZE[1] / 2
-			self.sprite_list = sprite_list
-			self.lastAtk = 0
-			self.facing = True
-			self.health = health
-			self.color = color
+    def __init__(
+        self,
+        # width: int,
+        # height: int,
+        # color: Tuple[int, int, int],
+        health: int,
+        sprite_list,
+    ):
+        super().__init__()
+        self.surf = load("img/Ichigo/idle/1.png").convert()
+        self.surf.set_colorkey((255, 255, 255), RLEACCEL)
+        self.rect = self.surf.get_rect()
+        self.rect.bottom = SIZE[1] / 2
+        # self.surf = Surface((width, height))
+        # self.surf.fill(color)
+        
+        self.state = AnimationStates.IDLE
+        self.vel_y = 0
+        self.sprite_list = sprite_list
+        self.lastAtk = 0
+        self.facing = True
+        self.health = health
+        # self.color = color
 
-	def move_x(self, right):
-			self.facing = right
-			self.rect.move_ip(VEL_X if right else -VEL_X, 0)
+    def move_x(self, right):
+        self.facing = right
+        self.rect.move_ip(VEL_X if right else -VEL_X, 0)
 
-			if 0 > self.rect.left:
-					self.rect.left = 0
-			if SIZE[0] < self.rect.right:
-					self.rect.right = SIZE[0]
+        if 0 > self.rect.left:
+            self.rect.left = 0
+        if SIZE[0] < self.rect.right:
+            self.rect.right = SIZE[0]
 
-	def jump(self):
-			if self.vel_y == 0:
-					self.vel_y = VEL_Y
+    def jump(self):
+        if self.vel_y == 0:
+            self.vel_y = VEL_Y
 
-	def apply_gravity(self):
-			self.rect.move_ip(0, -self.vel_y)
-			self.vel_y -= GRAVITY / FPS
+    def apply_gravity(self):
+        self.rect.move_ip(0, -self.vel_y)
+        self.vel_y -= GRAVITY / FPS
 
-			if self.rect.bottom > SIZE[1]:
-					self.rect.bottom = SIZE[1]
-					self.vel_y = 0
+        if self.rect.bottom > SIZE[1]:
+            self.rect.bottom = SIZE[1]
+            self.vel_y = 0
 
-	def melee_attack(self):
-		if get_ticks() >= self.lastAtk + 500:
-			self.lastAtk = get_ticks()
-			self.sprite_list.add(MeleeAttack(self, 30, 45, self.facing, 10))
-			
-	def ranged_attack(self):
-		if get_ticks() >= self.lastAtk + 500:
-			self.lastAtk = get_ticks()
-			self.sprite_list.add(
-					RangedAttack(self, 20 if self.facing else -20, 10, 10, self.facing, 10)
-			)
+    def melee_attack(self):
+        # if get_ticks() >= self.lastAtk + 500:
+        #     self.lastAtk = get_ticks()
+        #     self.sprite_list.add(MeleeAttack(self, 30, 45, self.facing, 10))
+        pass
 
-	def checkDmg(self):
-		atks = list(filter(lambda x: x.parent is not self, filter(lambda x: isinstance(x, Attack), self.sprite_list.sprites())))
+    def ranged_attack(self):
+        # if get_ticks() >= self.lastAtk + 500:
+        #     self.lastAtk = get_ticks()
+        #     self.sprite_list.add(
+        #         RangedAttack(self, 20 if self.facing else -20, 10, 10, self.facing, 10)
+        #     )
+        pass
 
-		self.surf.fill(self.color)
-		for atk in atks:
-			if(collide_rect(self, atk)):
-				self.health -= atk.damage
-				atk.kill()
-				self.surf.fill((255, 0, 255))
+    def checkDmg(self):
+        atks = list(
+            filter(
+                lambda x: x.parent is not self,
+                filter(lambda x: isinstance(x, Attack), self.sprite_list.sprites()),
+            )
+        )
 
-	def update(self, pressed_keys):
-			self.apply_gravity()
-			if pressed_keys[K_LEFT] or pressed_keys[K_a]:
-					self.move_x(False)
-			if pressed_keys[K_RIGHT] or pressed_keys[K_d]:
-					self.move_x(True)
-			if pressed_keys[K_UP] or pressed_keys[K_w]:
-					self.jump()
-			if pressed_keys[K_z]:
-					self.melee_attack()
-			if pressed_keys[K_x]:
-					self.ranged_attack()
-			self.checkDmg()
+        # self.surf.fill(self.color)
+        for atk in atks:
+            if collide_rect(self, atk):
+                self.health -= atk.damage
+                atk.kill()
+                # self.surf.fill((255, 0, 255))
+                
+    def animate(self):
+        pass
+
+    def update(self, pressed_keys):
+        self.apply_gravity()
+        if pressed_keys[K_LEFT] or pressed_keys[K_a]:
+            self.move_x(False)
+        if pressed_keys[K_RIGHT] or pressed_keys[K_d]:
+            self.move_x(True)
+        if pressed_keys[K_UP] or pressed_keys[K_w]:
+            self.jump()
+        if pressed_keys[K_z]:
+            self.melee_attack()
+        if pressed_keys[K_x]:
+            self.ranged_attack()
+        self.checkDmg()
+        
+        self.animate()
+
+class Ichigo(Player):
+    def __init__(self, health: int, sprite_list):
+        super().__init__(health, sprite_list)
+    
+    def melee_attack(self):
+        pass
+    
+    def ranged_attack(self):
+        pass
+    
+    def animate(self):
+        if self.state is AnimationStates.IDLE:
+            pass
+        elif self.state is AnimationStates.MOVE:
+            pass
+        elif self.state is AnimationStates.ATTACK:
+            pass
+        elif self.state is AnimationStates.JUMPUP:
+            pass
+        elif self.state is AnimationStates.JUMPDOWN:
+            pass
 
 class HealthBar(Sprite):
-	def __init__(self, player: Player, maxHealth:int, x, y):
-		super().__init__()
-		self.surfBg = Surface((100, 20))
-		self.rectBg = self.surfBg.get_rect()
-		self.surfBg.fill((10, 10, 10))
-		self.surfBar = Surface((100, 20))
-		self.surfBar.fill((255, 0, 0))
-		self.rectBar = self.surfBar.get_rect()
-		self.rectBg.move_ip(x, y)
-		self.rectBar.move_ip(x, y)
+    def __init__(self, player: Player, maxHealth: int, x, y):
+        super().__init__()
+        self.surfBg = Surface((100, 20))
+        self.rectBg = self.surfBg.get_rect()
+        self.surfBg.fill((10, 10, 10))
+        self.surfBar = Surface((100, 20))
+        self.surfBar.fill((255, 0, 0))
+        self.rectBar = self.surfBar.get_rect()
+        self.rectBg.move_ip(x, y)
+        self.rectBar.move_ip(x, y)
 
-		self.player = player
-		self.maxHealth = maxHealth
-	
-	def update(self, pressed_keys):
-		# self.rectBar.width = (self.player.health / self.maxHealth) * 100
-		self.surfBar = scale(self.surfBar, (int((self.player.health / self.maxHealth) * 100), 20))
+        self.player = player
+        self.maxHealth = maxHealth
 
+    def update(self, pressed_keys):
+        # self.rectBar.width = (self.player.health / self.maxHealth) * 100
+        self.surfBar = scale(
+            self.surfBar, (int((self.player.health / self.maxHealth) * 100), 20)
+        )
 
 
 class Attack(Sprite):
-	def __init__(
-			self,
-			parent: Player,
-			speed: int,
-			width: int,
-			height: int,
-			color: Tuple[int, int, int],
-			facing: bool,
-			damage: int,
-	):
-			super().__init__()
-			self.surf = Surface((width, height))
-			self.surf.fill(color)
-			self.rect = self.surf.get_rect()
-			self.rect.move_ip(
-					parent.rect.right if facing else (parent.rect.x - width), parent.rect.y
-			)
-			self.parent = parent
-			self.speed = speed
-			self.damage = damage
+    def __init__(
+        self,
+        parent: Player,
+        speed: int,
+        width: int,
+        height: int,
+        color: Tuple[int, int, int],
+        facing: bool,
+        damage: int,
+    ):
+        super().__init__()
+        self.surf = Surface((width, height))
+        self.surf.fill(color)
+        self.rect = self.surf.get_rect()
+        self.rect.move_ip(
+            parent.rect.right if facing else (parent.rect.x - width), parent.rect.y
+        )
+        self.parent = parent
+        self.speed = speed
+        self.damage = damage
 
-	def update(self, pressed_keys):
-			pass
+    def update(self, pressed_keys):
+        pass
 
 
 class MeleeAttack(Attack):
-	def __init__(
-			self, parent: Player, width: int, height: int, facing: bool, damage: int
-	):
-			super().__init__(parent, 0, width, height, (255, 0, 0), facing, damage)
-			self.timer = get_ticks()
+    def __init__(
+        self, parent: Player, width: int, height: int, facing: bool, damage: int
+    ):
+        super().__init__(parent, 0, width, height, (255, 0, 0), facing, damage)
+        self.timer = get_ticks()
 
-	def update(self, _):
-		if get_ticks() >= self.timer + 250:
-			self.kill()
+    def update(self, _):
+        if get_ticks() >= self.timer + 250:
+            self.kill()
 
 
 class RangedAttack(Attack):
-	def __init__(
-			self,
-			parent: Player,
-			speed: int,
-			width: int,
-			height: int,
-			facing: bool,
-			damage: int,
-	):
-			super().__init__(parent, speed, width, height, (0, 255, 0), facing, damage)
+    def __init__(
+        self,
+        parent: Player,
+        speed: int,
+        width: int,
+        height: int,
+        facing: bool,
+        damage: int,
+    ):
+        super().__init__(parent, speed, width, height, (0, 255, 0), facing, damage)
 
-	def update(self, _):
-			self.rect.move_ip(self.speed, 0)
+    def update(self, _):
+        self.rect.move_ip(self.speed, 0)
 
-			if 0 > self.rect.left or SIZE[0] < self.rect.right:
-				self.kill()
+        if 0 > self.rect.left or SIZE[0] < self.rect.right:
+            self.kill()
