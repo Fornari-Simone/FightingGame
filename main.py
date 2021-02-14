@@ -1,16 +1,17 @@
 # region Imports
 
-from pygame.constants import KEYUP, K_LEFT, K_RIGHT, K_UP, K_a, K_d, K_w, K_z, K_x
+from pygame.constants import K_LEFT, K_RIGHT, K_UP, K_a, K_d, K_w, K_z, K_x
 from custom_udp import UDP_P2P
 from pygame.display import set_caption, set_icon, set_mode, flip
-from game_const import SIZE, TITLE, ICON_PATH, COLOR, FPS
+from game_const import Color, Game
 from pygame.key import get_pressed
 from pygame.sprite import Group
 from pygame.locals import QUIT
 from pygame.image import load
 from pygame.time import Clock
 from pygame.event import get
-from Player import Attack, Player, HealthBar
+from Player import Ichigo, Player
+from HealthBar import HealthBar
 from pygame import init
 
 # endregion
@@ -46,18 +47,18 @@ init()
 
 clock = Clock()
 
-screen = set_mode(SIZE)
-set_caption(TITLE)
-set_icon(load(ICON_PATH))
+screen = set_mode(Game.SIZE)
+set_caption(Game.TITLE)
+set_icon(load(Game.ICON_PATH))
 
 udp = UDP_P2P("192.168.192.67", 6000, 6000)
 
 all_sprites = Group()
 
-pl = Player(50, 50, (255, 0, 0), 100, all_sprites)
+pl = Ichigo(100, all_sprites)
 plH = HealthBar(pl, 100, 10, 10)
-pl2 = Player(50, 50, (0, 0, 255), 100, all_sprites)
-pl2H = HealthBar(pl2, 100, SIZE[0] - 110, 10)
+pl2 = Ichigo(100, all_sprites)
+pl2H = HealthBar(pl2, 100, Game.SIZE[0] - 110, 10)
 all_sprites.add(pl)
 
 rcvT = udp.receptionThread(rcv, rcvErr)
@@ -76,16 +77,18 @@ while running:
     plH.update(pressed_keys)
     pl2H.update(pressed_keys)
 
-    screen.fill(COLOR)
+    screen.fill(Color.BLACK)
 
-    for s in all_sprites:
-        screen.blit(s.surf, s.rect)
+    all_sprites.draw(screen)
+
+    # for s in all_sprites:
+    #     screen.blit(s.surf, s.rect)
 
     screen.blit(plH.surfBg, plH.rectBg)
     screen.blit(plH.surfBar, plH.rectBar)
     screen.blit(pl2H.surfBg, pl2H.rectBg)
     screen.blit(pl2H.surfBar, pl2H.rectBar)
-    screen.blit(pl2.surf, pl2.rect)
+    screen.blit(pl2.image, pl2.rect)
 
     flip()
-    clock.tick(FPS)
+    clock.tick(Game.FPS)
