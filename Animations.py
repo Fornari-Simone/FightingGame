@@ -1,9 +1,8 @@
 # region Imports
-from enum import Enum
-from game_const import Color
-from pygame.image import load
-from pygame.constants import RLEACCEL
 
+from enum import Enum
+from pygame.image import load
+from pygame.transform import scale2x
 
 # endregion Imports
 
@@ -14,6 +13,7 @@ class AnimationStates(Enum):
     JUMPUP = 2
     JUMPDOWN = 3
     ATTACK = 4
+    COOLDOWN = -1
 
 
 class Animation:
@@ -21,8 +21,8 @@ class Animation:
         self.frames = []
 
         for i in range(numFrame):
-            s = load(f"{folder}/{i}.png").convert()
-            s.set_colorkey(Color.WHITE, RLEACCEL)
+            s = load(f"{folder}/{i}.png").convert_alpha()
+            s = scale2x(s)
             self.frames.append(s)
 
         self.index = 0
@@ -34,6 +34,3 @@ class Animation:
         if self.index == self.len:
             self.index = 0
         return r
-
-
-# def reset(self): self.index = 0
