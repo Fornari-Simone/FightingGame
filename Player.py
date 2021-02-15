@@ -32,7 +32,7 @@ class Player(Sprite):
         self.current_frame = 0
         self.animation_frame = 6
 
-        self.vel_y = 0
+        self.vel_y = -Physics.VEL_Y
         self.sprite_list = sprite_list
         self.lastAtk = 0
         self.facing = True
@@ -94,25 +94,33 @@ class Player(Sprite):
 
     def update(self, pressed_keys):
         self.apply_gravity()
-        if pressed_keys[K_LEFT] or pressed_keys[K_a]:
+        if pressed_keys[K_LEFT]:
             self.move_x(False)
-        if pressed_keys[K_RIGHT] or pressed_keys[K_d]:
+            self.state = AnimationStates.MOVE
+        if pressed_keys[K_RIGHT]:
             self.move_x(True)
-        if pressed_keys[K_UP] or pressed_keys[K_w]:
+            self.state = AnimationStates.MOVE
+        if pressed_keys[K_UP]:
             self.jump()
         if pressed_keys[K_z]:
             self.melee_attack()
         if pressed_keys[K_x]:
             self.ranged_attack()
+        if not(self.rect.bottom == Game.SIZE[1]):
+            if self.vel_y > 0: 
+                self.state = AnimationStates.JUMPUP
+            if self.vel_y < 0: 
+                self.state = AnimationStates.JUMPDOWN
+        elif not pressed_keys[K_LEFT] and not pressed_keys[K_RIGHT] and not pressed_keys[K_UP] and not pressed_keys[K_z] and not pressed_keys[K_x]:
+            self.state = AnimationStates.IDLE
         self.checkDmg()
-
         self.animate()
 
 
 class Ichigo(Player):
     def __init__(self, health: int, sprite_list):
         super().__init__(health, sprite_list)
-        self.image = load("img/Ichigo/idle/1.png").convert()
+        self.image = load("img/Ichigo/Idle/1.png").convert()
         self.rect = self.image.get_rect()
         self.rect.bottom = Game.SIZE[1] / 2
         self.anims = [
@@ -120,7 +128,40 @@ class Ichigo(Player):
             Animation("img/Ichigo/Movement", 8),
             Animation("img/Ichigo/JumpUp", 2),
             Animation("img/Ichigo/JumpDown", 2),
-            # Animation("img/Ichigo/Attack", 4),
+            Animation("img/Ichigo/Attack", 4),
+        ]
+    
+    def move_x(self, right):
+        super().move_x(right)
+
+    def melee_attack(self):
+        pass
+
+    def ranged_attack(self):
+        pass
+
+    def animate(self):
+        if self.current_frame == self.animation_frame:
+            self.current_frame = 0
+            self.image = (
+                self.anims[self.state.value].next()
+                if self.facing
+                else flip(self.anims[self.state.value].next(), True, False)
+            )
+        self.current_frame += 1
+        
+class Vegeth(Player):
+    def __init__(self, health: int, sprite_list):
+        super().__init__(health, sprite_list)
+        self.image = load("img/Vegeth/Idle/0.png").convert()
+        self.rect = self.image.get_rect()
+        self.rect.bottom = Game.SIZE[1] / 2
+        self.anims = [
+            Animation("img/Vegeth/Idle", 4),
+            Animation("img/Vegeth/Movement", 4),
+            Animation("img/Vegeth/JumpUp", 2),
+            Animation("img/Vegeth/JumpDown", 2),
+            Animation("img/Vegeth/Attack", 4),
         ]
     
     def move_x(self, right):

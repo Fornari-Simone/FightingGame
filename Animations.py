@@ -11,9 +11,9 @@ from pygame.constants import RLEACCEL
 class AnimationStates(Enum):
     IDLE = 0
     MOVE = 1
-    JUMPUP = 3
-    JUMPDOWN = 4
-    ATTACK = 5
+    JUMPUP = 2
+    JUMPDOWN = 3
+    ATTACK = 4
 
 
 class Animation:
