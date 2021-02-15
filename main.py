@@ -58,7 +58,7 @@ udp = UDP_P2P("192.168.192.67", 6000, 6000)
 all_sprites = Group()
 
 pl = Ichigo(True, all_sprites)
-pl2 = Ichigo(False, all_sprites)
+pl2 = Vegeth(False, all_sprites)
 all_sprites.add(pl)
 
 rcvT = udp.receptionThread(rcv, rcvErr)

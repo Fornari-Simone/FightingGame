@@ -194,7 +194,7 @@ class Vegeth(Player):
                 AS.MOVE: Animation("img/Vegeth/Movement", 4),
                 AS.JUMPUP: Animation("img/Vegeth/JumpUp", 1),
                 AS.JUMPDOWN: Animation("img/Vegeth/JumpDown", 1),
-                AS.ATTACK: Animation("img/Vegeth/Attack", 5),
+                AS.ATTACK: Animation("img/Vegeth/Attack", 4),
             },
             sprite_list,
         )
@@ -206,41 +206,6 @@ class Vegeth(Player):
             self.current_atk_frame = 0
             self.sprite_list.add(
                 MeleeAttack(self, 0, 70, 40, 50, self.facing, 10, self.atk_frames)
-            )
-        self.current_frame += 1
-    def charged_attack(self):
-        pass
-        
-class Vegeth(Player):
-    def __init__(self, health: int, sprite_list):
-        super().__init__(health, sprite_list)
-        self.image = load("img/Vegeth/Idle/0.png").convert()
-        self.rect = self.image.get_rect()
-        self.rect.bottom = Game.SIZE[1] / 2
-        self.anims = [
-            Animation("img/Vegeth/Idle", 4),
-            Animation("img/Vegeth/Movement", 4),
-            Animation("img/Vegeth/JumpUp", 2),
-            Animation("img/Vegeth/JumpDown", 2),
-            Animation("img/Vegeth/Attack", 4),
-        ]
-    
-    def move_x(self, right):
-        super().move_x(right)
-
-    def melee_attack(self):
-        pass
-
-    def ranged_attack(self):
-        pass
-
-    def animate(self):
-        if self.current_frame == self.animation_frame:
-            self.current_frame = 0
-            self.image = (
-                self.anims[self.state.value].next()
-                if self.facing
-                else flip(self.anims[self.state.value].next(), True, False)
             )
         self.current_frame += 1
     def charged_attack(self):
