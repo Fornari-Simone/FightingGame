@@ -9,12 +9,11 @@ class Color:
 
 class Physics:
     GRAVITY = 9.8
-    VEL_Y = 7.5
+    VEL_Y = 5
     VEL_X = 5
     
 class Game:
 	ICON_PATH = "img/GameIcon.png"
-	BG_PATH = "img/Background/Bleach.png"
 	TITLE = "Fighting Game"
-	SIZE = (800, 500)
+	SIZE = (600, 600)
 	FPS = 60
