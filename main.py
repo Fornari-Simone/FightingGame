@@ -67,6 +67,7 @@ all_sprites = Group()
 <<<<<<< HEAD
 <<<<<<< HEAD
 pl = Ichigo(True, all_sprites)
+<<<<<<< HEAD
 pl2 = Vegeth(False, all_sprites)
 =======
 pl = Ichigo(100, all_sprites)
@@ -80,6 +81,9 @@ plH = HealthBar(pl, 100, 10, 10)
 # pl2 = Ichigo(100, all_sprites)
 # pl2H = HealthBar(pl2, 100, Game.SIZE[0] - 110, 10)
 >>>>>>> parent of 30d4737 (Merge branch 'master' of https://github.com/Fornari-Simone/FightingGame)
+=======
+pl2 = Ichigo(False, all_sprites)
+>>>>>>> parent of f8655d0 (deleted)
 all_sprites.add(pl)
 
 rcvT = udp.receptionThread(rcv, rcvErr)
