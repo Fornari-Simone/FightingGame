@@ -20,6 +20,7 @@ class Player(Sprite):
         sprite_list,
     ):
         super().__init__()
+<<<<<<< HEAD
         self.anims = animationFrames
         self.image = self.anims[AS.IDLE].next()
         self.rect = self.image.get_rect()
@@ -44,6 +45,20 @@ class Player(Sprite):
 
         self.health = HealthBar(health, facing)
 
+=======
+        # self.surf = load("img/Ichigo/idle/1.png").convert()
+        # self.surf.set_colorkey((255, 255, 255), RLEACCEL)
+        # self.rect = self.surf.get_rect()
+        # self.rect.bottom = Game.SIZE[1] / 2
+        # self.surf = Surface((width, height))
+        # self.surf.fill(color)
+
+        self.state = AnimationStates.IDLE
+        self.current_frame = 0
+        self.animation_frame = 6
+
+        self.vel_y = 0
+>>>>>>> parent of c152f7f (add animation jump, movement,)
         self.sprite_list = sprite_list
 
     def move_x(self, right):
@@ -124,6 +139,7 @@ class Player(Sprite):
 
     def update(self, pressed_keys):
         self.apply_gravity()
+<<<<<<< HEAD
 
         self.checkDmg()
 
@@ -171,6 +187,39 @@ class Ichigo(Player):
             },
             sprite_list,
         )
+=======
+        if pressed_keys[K_LEFT] or pressed_keys[K_a]:
+            self.move_x(False)
+        if pressed_keys[K_RIGHT] or pressed_keys[K_d]:
+            self.move_x(True)
+        if pressed_keys[K_UP] or pressed_keys[K_w]:
+            self.jump()
+        if pressed_keys[K_z]:
+            self.melee_attack()
+        if pressed_keys[K_x]:
+            self.ranged_attack()
+        self.checkDmg()
+
+        self.animate()
+
+
+class Ichigo(Player):
+    def __init__(self, health: int, sprite_list):
+        super().__init__(health, sprite_list)
+        self.image = load("img/Ichigo/idle/1.png").convert()
+        self.rect = self.image.get_rect()
+        self.rect.bottom = Game.SIZE[1] / 2
+        self.anims = [
+            Animation("img/Ichigo/Idle", 4),
+            Animation("img/Ichigo/Movement", 8),
+            Animation("img/Ichigo/JumpUp", 2),
+            Animation("img/Ichigo/JumpDown", 2),
+            # Animation("img/Ichigo/Attack", 4),
+        ]
+    
+    def move_x(self, right):
+        super().move_x(right)
+>>>>>>> parent of c152f7f (add animation jump, movement,)
 
     def melee_attack(self):
         if self.current_atk_frame == 0:
@@ -183,6 +232,7 @@ class Ichigo(Player):
     def charged_attack(self):
         pass
 
+<<<<<<< HEAD
 
 class Vegeth(Player):
     def __init__(self, facing, sprite_list):
@@ -210,3 +260,14 @@ class Vegeth(Player):
         self.current_frame += 1
     def charged_attack(self):
         pass
+=======
+    def animate(self):
+        if self.current_frame == self.animation_frame:
+            self.current_frame = 0
+            self.image = (
+                self.anims[self.state.value].next()
+                if self.facing
+                else flip(self.anims[self.state.value].next(), True, False)
+            )
+        self.current_frame += 1
+>>>>>>> parent of c152f7f (add animation jump, movement,)

@@ -10,10 +10,16 @@ from pygame.transform import scale2x
 class AnimationStates(Enum):
     IDLE = 0
     MOVE = 1
+<<<<<<< HEAD
     JUMPUP = 2
     JUMPDOWN = 3
     ATTACK = 4
     COOLDOWN = -1
+=======
+    JUMPUP = 3
+    JUMPDOWN = 4
+    ATTACK = 5
+>>>>>>> parent of c152f7f (add animation jump, movement,)
 
 
 class Animation:
