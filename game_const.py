@@ -18,3 +18,4 @@ class Game:
 	TITLE = "Fighting Game"
 	SIZE = (800, 500)
 	FPS = 60
+	si = 0
