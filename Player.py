@@ -233,7 +233,7 @@ class Vegeth(Player):
                 AS.MOVE: Animation("img/Vegeth/Movement", 4),
                 AS.JUMPUP: Animation("img/Vegeth/JumpUp", 1),
                 AS.JUMPDOWN: Animation("img/Vegeth/JumpDown", 1),
-                AS.ATTACK: Animation("img/Vegeth/Attack", 5),
+                AS.ATTACK: Animation("img/Vegeth/Attack", 4),
             },
             sprite_list,
         )
@@ -249,7 +249,6 @@ class Vegeth(Player):
         self.current_frame += 1
     def charged_attack(self):
         pass
-<<<<<<< HEAD
 =======
 =======
     def ranged_attack(self):
@@ -264,8 +263,6 @@ class Vegeth(Player):
                 else flip(self.anims[self.state.value].next(), True, False)
             )
         self.current_frame += 1
-=======
->>>>>>> parent of f8655d0 (deleted)
         
 class Vegeth(Player):
     def __init__(self, health: int, sprite_list):
@@ -290,10 +287,7 @@ class Vegeth(Player):
     def ranged_attack(self):
         pass
 
-<<<<<<< HEAD
 >>>>>>> parent of 30d4737 (Merge branch 'master' of https://github.com/Fornari-Simone/FightingGame)
-=======
->>>>>>> parent of f8655d0 (deleted)
     def animate(self):
         if self.current_frame == self.animation_frame:
             self.current_frame = 0
@@ -303,14 +297,8 @@ class Vegeth(Player):
                 else flip(self.anims[self.state.value].next(), True, False)
             )
 <<<<<<< HEAD
-<<<<<<< HEAD
         self.current_frame += 1
 >>>>>>> parent of c152f7f (add animation jump, movement,)
 =======
         self.current_frame += 1
 >>>>>>> parent of 30d4737 (Merge branch 'master' of https://github.com/Fornari-Simone/FightingGame)
-=======
-        self.current_frame += 1
-    def charged_attack(self):
-        pass
->>>>>>> parent of f8655d0 (deleted)
