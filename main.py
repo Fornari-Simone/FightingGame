@@ -1,5 +1,6 @@
 # region Imports
 
+from datetime import datetime
 from pygame.constants import K_LEFT, K_RIGHT, K_UP, K_a, K_d, K_w, K_z, K_x
 from pygame.transform import scale
 from custom_udp import UDP_P2P
@@ -15,6 +16,10 @@ from Player import Ichigo, Vegeth
 from pygame import init
 
 # endregion
+
+init()
+
+IP = "127.0.0.1"
 
 
 def snd(keys):
@@ -33,56 +38,67 @@ def snd(keys):
     udp.transmission("CBG", "01", "CeF", msg)
 
 
-def rcv(data, addr, port):
-    if running:
-        keys = eval(data.msg)
-        pl2.update(keys)
+def rcv(pl, data, addr, port):
+    keys = eval(data.msg)
+    pl.update(keys)
 
 
 def rcvErr(e):
     pass
 
 
-init()
+def gameloop():
+    clock = Clock()
 
-clock = Clock()
+    screen = set_mode(Game.SIZE)
+    set_caption(Game.TITLE)
+    set_icon(load(Game.ICON_PATH))
+    bg = load(Game.BG_PATH).convert_alpha()
+    bg = scale(bg, Game.SIZE)
 
-screen = set_mode(Game.SIZE)
-set_caption(Game.TITLE)
-set_icon(load(Game.ICON_PATH))
-bg = load(Game.BG_PATH).convert_alpha()
-bg = scale(bg, Game.SIZE)
+    all_sprites = Group()
 
-udp = UDP_P2P("192.168.192.67", 6000, 6000)
+    pl = Ichigo(True, all_sprites)
+    pl2 = Ichigo(False, all_sprites)
+    all_sprites.add(pl)
 
-all_sprites = Group()
+    rcvT = udp.receptionThread(
+        lambda data, addr, port: rcv(pl2, data, addr, port), rcvErr
+    )
+    rcvT.start()
 
-pl = Ichigo(True, all_sprites)
-pl2 = Ichigo(False, all_sprites)
-all_sprites.add(pl)
+    while True:
+        for event in get():
+            if event.type == QUIT:
+                udp.stopThread()
+                return
 
-rcvT = udp.receptionThread(rcv, rcvErr)
-rcvT.start()
+        pressed_keys = get_pressed()
+        snd(pressed_keys)
+        all_sprites.update(pressed_keys)
+        screen.fill(Color.WHITE)
+        screen.blit(bg, (0, 0))
+        all_sprites.draw(screen)
+        pl2.draw(screen)
+        pl.health.draw(screen)
+        pl2.health.draw(screen)
+        flip()
+        clock.tick(Game.FPS)
 
-running = True
-while running:
-    for event in get():
-        if event.type == QUIT:
-            running = False
 
-    pressed_keys = get_pressed()
-    snd(pressed_keys)
+if __name__ == "__main__":
+    udp = UDP_P2P(IP, 6000, 6000)
 
-    all_sprites.update(pressed_keys)
+    while True:
+        udp.transmission("CBG", "01", "cazzo", "player order")
+        rdata, _, rtime = udp.singleReceive()
+        if rdata.msg == "player order":
+            stime = udp.transmission("CBG", "01", "cazzo", "p1")
+            rdata, _, rtime = udp.singleReceive()
+            imPlayer1 = stime < datetime.strptime(rdata.time + "000", "%H%M%S%f")
+            print(stime)
+            print(datetime.strptime(rdata.time + "000", "%H%M%S%f"))
+            print(imPlayer1)
+            break
 
-    screen.fill(Color.WHITE)
-    screen.blit(bg, (0, 0))
-
-    all_sprites.draw(screen)
-    pl2.draw(screen)
-
-    pl.health.draw(screen)
-    pl2.health.draw(screen)
-
-    flip()
-    clock.tick(Game.FPS)
+    # gameloop()

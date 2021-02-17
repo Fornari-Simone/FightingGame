@@ -47,7 +47,7 @@ class UDP_P2P:
 
         self.stop_flag = False
 
-    def transmission(self, app: str, ver: str, nick: str, msg: str) -> None:
+    def transmission(self, app: str, ver: str, nick: str, msg: str) -> datetime:
         """
         Handles the transmission of a `Packet` object
 
@@ -73,6 +73,7 @@ class UDP_P2P:
                 msg,
             )
             self.sockSend.sendto(p.bytes, (self.ipDest, self.sendPort))
+            return datetime.strptime(p.time + "000", "%H%M%S%f")
         except Exception as e:
             raise e
 
@@ -89,7 +90,8 @@ class UDP_P2P:
                 `summary`: a function to handle the received data (data, (address, port))
             `onErr {function (Exception): None}`:
                 `summary`: a function to handle the raise of an exception
-
+    
+i
         ### Returns
             `Thread`: the thread that runs the reception method with `f` and `onErr` as arguments.\n
             \t\tThe thread is a deamon
@@ -133,6 +135,12 @@ class UDP_P2P:
 
         self.__closeSockRecv()
 
+    def singleReceive(self):
+        data, addr = self.sockRecv.recvfrom(130)
+        time = datetime.now().strftime("%H%M%S%f")
+        data = Packet(data)
+        return (data, addr, datetime.strptime(time, "%H%M%S%f"))
+
     def stopThread(self) -> None:
         """
         A method to stop a running thread from `receptionThread`
@@ -167,7 +175,7 @@ class UDP_P2P:
                 `summary`: the least recent time
 
         ### Returns
-            `int`: the number of milliseconds between the two tmes
+            `int`: the number of milliseconds between the two times
         """
 
         return int((t1 - t2).total_seconds() * 1000)
