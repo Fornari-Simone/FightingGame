@@ -89,16 +89,34 @@ def gameloop():
 if __name__ == "__main__":
     udp = UDP_P2P(IP, 6000, 6000)
 
+    # p1      p2 
+    # on  --> lose
+    # get <-- on
+    #     --> get
+    # get <-- 
+    #     --> get
+    # lose<--
+
+    conn = 0
     while True:
-        udp.transmission("CBG", "01", "cazzo", "player order")
-        rdata, _, rtime = udp.singleReceive()
-        if rdata.msg == "player order":
-            stime = udp.transmission("CBG", "01", "cazzo", "p1")
+        if conn < 2:
+            udp.transmission("CBG", "01", "nick", "connection")
+            data, _, _ = udp.singleReceive()
+            print(data.msg)
+            if data.msg == "connection":
+                conn+=1
+            if conn == 2:
+                udp.transmission("CBG", "01", "nick", "connection")
+        else: 
+            udp.transmission("CBG", "01", "cazzo", "player order")
             rdata, _, rtime = udp.singleReceive()
-            imPlayer1 = stime < datetime.strptime(rdata.time + "000", "%H%M%S%f")
-            print(stime)
-            print(datetime.strptime(rdata.time + "000", "%H%M%S%f"))
-            print(imPlayer1)
-            break
+            if rdata.msg == "player order":
+                stime = udp.transmission("CBG", "01", "cazzo", "p1")
+                rdata, _, rtime = udp.singleReceive()
+                imPlayer1 = stime < datetime.strptime(rdata.time + "000", "%H%M%S%f")
+                print(stime)
+                print(datetime.strptime(rdata.time + "000", "%H%M%S%f"))
+                print(imPlayer1)
+                break
 
     # gameloop()
