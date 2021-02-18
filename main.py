@@ -89,13 +89,14 @@ def gameloop():
 if __name__ == "__main__":
     udp = UDP_P2P(IP, 6000, 6000)
 
-    # p1      p2 
-    # on  --> lose
-    # get <-- on
-    #     --> get
+    # p1  conn p2 
+    # on  -->  lose
+    # get <--  on
+    #     -->  get
     # get <-- 
-    #     --> get
-    # lose<--
+    #     -->  get
+    # lose <--
+    
 
     conn = 0
     while True:
