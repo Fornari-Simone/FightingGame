@@ -46,7 +46,7 @@ def rcvErr(e):
     pass
 
 
-def gameloop(playerOrder, udp):
+def gameloop(playerOrder, p1Char, p2Char, udp):
     clock = Clock()
 
     screen = set_mode(Game.SIZE)
@@ -57,14 +57,21 @@ def gameloop(playerOrder, udp):
 
     all_sprites = Group()
 
-    pl = Ichigo(playerOrder, all_sprites)
-    pl2 = Ichigo(not playerOrder, all_sprites)
+    if p1Char == "Ichigo":
+        pl = Ichigo(playerOrder, all_sprites)
+    elif p1Char == "Vegeth":
+        pl = Vegeth(playerOrder, all_sprites)
+
+    if p2Char == "Ichigo":
+        pl2 = Ichigo(not playerOrder, all_sprites)
+    elif p2Char == "Vegeth":
+        pl2 = Vegeth(not playerOrder, all_sprites)
 
     rcvT = udp.receptionThread(
         lambda data, addr, port: rcv(pl2, data, addr, port), rcvErr
     )
     rcvT.start()
-    
+
     gameState = Game.INGAME
     while not gameState:
         for event in get():
@@ -92,11 +99,11 @@ def gameloop(playerOrder, udp):
 if __name__ == "__main__":
     # udp = UDP_P2P(IP, 6000, 6000)
     # """
-	# 	p1      p2
-	# 	on  -->  lose
-	# 	get <--  on
-		
-	# """
+    # 	p1      p2
+    # 	on  -->  lose
+    # 	get <--  on
+
+    # """
     # while True:
     #     udp.transmission("CBG", "01", "cazzo", "connection")
     #     rdata, _, rtime = udp.singleReceive()
