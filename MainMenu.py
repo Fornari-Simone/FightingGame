@@ -1,7 +1,6 @@
 # region Imports
 
 from tkinter import Tk, LEFT, TOP, Toplevel, messagebox, END, Label
-import tkinter
 from tkinter.constants import ACTIVE, CENTER, DISABLED, NORMAL, RIGHT, X
 from tkinter.scrolledtext import ScrolledText
 from tkinter.simpledialog import Dialog
@@ -11,6 +10,8 @@ from packet import NICK_LEN, Packet
 from custom_udp import UDP_P2P
 from datetime import datetime
 from typing import Tuple
+import socket
+import urllib.request
 
 # endregion Imports
 
@@ -35,6 +36,13 @@ class MainMenu:
         self.infoBtn.grid(row=1, column=0)
         self.quitBtn = Button(self.root, text="Quit", command=self.__quit, width=15)
         self.quitBtn.grid(row=1, column=1)
+        self.ipLbl = Label(
+            self.root,
+            text=f"""
+            Private IP: {socket.gethostbyname(socket.gethostname())}\n
+            Public IP: {urllib.request.urlopen('https://ident.me').read().decode('utf8')}""",
+        )
+        self.ipLbl.grid(row=2, column=0)
         # endregion
 
         self.root.mainloop()
@@ -43,6 +51,10 @@ class MainMenu:
         self.root.withdraw()
         try:
             self.__input()
+        except:
+            pass
+        finally:
+            self.root.wm_deiconify()
             udp = UDP_P2P(self.ipDest, 6000, 6000)
             while True:
                 udp.transmission("CBG", "01", self.username, "connection")
@@ -58,32 +70,19 @@ class MainMenu:
                     )
                     break
             self.gameloop(imPlayer1, self.character, rdata.msg, udp)
-        except:
-            pass
-        finally:
-            self.root.wm_deiconify()
 
     def __info(self):
         self.root.withdraw()
-        # newWindow = Tk()
-        # newWindow.geometry("600x600")
-        # newWindow.title("Commands")
-        # Label(newWindow, text="Command\n\nArrow Up --> Jump\nArrow Left --> Move to Left\nArrow Right --> Move to Right\nz --> Normal Attack\nx --> Charged Attack").pack()
-        # # entry = Entry(newWindow)
-        # # entry.pack()
-        # # entry.insert(
-        # #     "end",
-        # #     "Arrow Up --> Jump\nArrow Left --> Move to Left\nArrow Right --> Move to Right\nz --> Normal Attack\nx --> Charged Attack",
-        # # )
-        # Button(newWindow, text="Go to Menu", command=lambda : self.__destroyInfo(newWindow)).pack()
         messagebox.showinfo(
             "CONTROLS",
-            "Jump: Up Arrow\nMove to Left: Left Arrow\nMove to Right: Right Arrow\nNormal Attack: Z\nCharged Attack: X",
+            f"""
+            Jump: Up Arrow\n
+            Move to Left: Left Arrow\n
+            Move to Right: Right Arrow\n
+            Normal Attack: Z\n
+            Charged Attack: X\n
+            """,
         )
-        self.root.wm_deiconify()
-
-    def __destroyInfo(self, new):
-        new.destroy()
         self.root.wm_deiconify()
 
     def __quit(self):

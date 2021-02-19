@@ -97,24 +97,4 @@ def gameloop(playerOrder, p1Char, p2Char, udp):
 
 
 if __name__ == "__main__":
-    # udp = UDP_P2P(IP, 6000, 6000)
-    # """
-    # 	p1      p2
-    # 	on  -->  lose
-    # 	get <--  on
-
-    # """
-    # while True:
-    #     udp.transmission("CBG", "01", "cazzo", "connection")
-    #     rdata, _, rtime = udp.singleReceive()
-    #     if rdata.msg == "connection":
-    #         udp.transmission("CBG", "01", "cazzo", "connection")
-    #         stime = udp.transmission("CBG", "01", "cazzo", "player order")
-    #         rdata, _, rtime = udp.singleReceive()
-    #         if rdata.msg == "connection":
-    #             rdata, _, rtime = udp.singleReceive()
-    #         imPlayer1 = stime < datetime.strptime(rdata.time + "000", "%H%M%S%f")
-    #         break
-
-    # gameloop(imPlayer1, udp)
     MainMenu(gameloop)
