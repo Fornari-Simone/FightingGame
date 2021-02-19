@@ -1,7 +1,8 @@
 # region Imports
 
+from MainMenu import MainMenu
 from datetime import datetime
-from pygame.constants import K_LEFT, K_RIGHT, K_UP, K_a, K_d, K_w, K_z, K_x
+from pygame.constants import K_LEFT, K_RIGHT, K_UP, K_a, K_d, K_k, K_l, K_w, K_z, K_x
 from pygame.transform import scale
 from custom_udp import UDP_P2P
 from pygame.display import set_caption, set_icon, set_mode, flip
@@ -19,18 +20,15 @@ from pygame import init
 
 init()
 
-IP = "127.0.0.1"
+IP = "79.56.131.174"
 
 
-def snd(keys):
+def snd(keys, udp):
     msg = str(
         {
             K_LEFT: keys[K_LEFT],
             K_RIGHT: keys[K_RIGHT],
             K_UP: keys[K_UP],
-            K_a: keys[K_a],
-            K_d: keys[K_d],
-            K_w: keys[K_w],
             K_z: keys[K_z],
             K_x: keys[K_x],
         }
@@ -44,10 +42,11 @@ def rcv(pl, data, addr, port):
 
 
 def rcvErr(e):
+    print("OH NO")
     pass
 
 
-def gameloop():
+def gameloop(playerOrder, udp):
     clock = Clock()
 
     screen = set_mode(Game.SIZE)
@@ -58,66 +57,57 @@ def gameloop():
 
     all_sprites = Group()
 
-    pl = Ichigo(True, all_sprites)
-    pl2 = Ichigo(False, all_sprites)
-    all_sprites.add(pl)
+    pl = Ichigo(playerOrder, all_sprites)
+    pl2 = Ichigo(not playerOrder, all_sprites)
 
     rcvT = udp.receptionThread(
         lambda data, addr, port: rcv(pl2, data, addr, port), rcvErr
     )
     rcvT.start()
-
-    while True:
+    
+    gameState = Game.INGAME
+    while not gameState:
         for event in get():
             if event.type == QUIT:
                 udp.stopThread()
                 return
 
         pressed_keys = get_pressed()
-        snd(pressed_keys)
+        snd(pressed_keys, udp)
         all_sprites.update(pressed_keys)
+        pl.update(pressed_keys)
+
         screen.fill(Color.WHITE)
         screen.blit(bg, (0, 0))
         all_sprites.draw(screen)
+        pl.draw(screen)
         pl2.draw(screen)
         pl.health.draw(screen)
         pl2.health.draw(screen)
+
         flip()
         clock.tick(Game.FPS)
 
 
 if __name__ == "__main__":
-    udp = UDP_P2P(IP, 6000, 6000)
+    # udp = UDP_P2P(IP, 6000, 6000)
+    # """
+	# 	p1      p2
+	# 	on  -->  lose
+	# 	get <--  on
+		
+	# """
+    # while True:
+    #     udp.transmission("CBG", "01", "cazzo", "connection")
+    #     rdata, _, rtime = udp.singleReceive()
+    #     if rdata.msg == "connection":
+    #         udp.transmission("CBG", "01", "cazzo", "connection")
+    #         stime = udp.transmission("CBG", "01", "cazzo", "player order")
+    #         rdata, _, rtime = udp.singleReceive()
+    #         if rdata.msg == "connection":
+    #             rdata, _, rtime = udp.singleReceive()
+    #         imPlayer1 = stime < datetime.strptime(rdata.time + "000", "%H%M%S%f")
+    #         break
 
-    # p1  conn p2 
-    # on  -->  lose
-    # get <--  on
-    #     -->  get
-    # get <-- 
-    #     -->  get
-    # lose <--
-    
-
-    conn = 0
-    while True:
-        if conn < 2:
-            udp.transmission("CBG", "01", "nick", "connection")
-            data, _, _ = udp.singleReceive()
-            print(data.msg)
-            if data.msg == "connection":
-                conn+=1
-            if conn == 2:
-                udp.transmission("CBG", "01", "nick", "connection")
-        else: 
-            udp.transmission("CBG", "01", "cazzo", "player order")
-            rdata, _, rtime = udp.singleReceive()
-            if rdata.msg == "player order":
-                stime = udp.transmission("CBG", "01", "cazzo", "p1")
-                rdata, _, rtime = udp.singleReceive()
-                imPlayer1 = stime < datetime.strptime(rdata.time + "000", "%H%M%S%f")
-                print(stime)
-                print(datetime.strptime(rdata.time + "000", "%H%M%S%f"))
-                print(imPlayer1)
-                break
-
-    # gameloop()
+    # gameloop(imPlayer1, udp)
+    MainMenu(gameloop)

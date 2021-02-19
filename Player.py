@@ -1,4 +1,5 @@
 # region Imports
+from pygame.constants import K_k, K_l
 from HealthBar import HealthBar
 from Attack import Attack, MeleeAttack
 from pygame.locals import K_LEFT, K_a, K_RIGHT, K_d, K_UP, K_w, K_z, K_x
@@ -92,7 +93,12 @@ class Player(Sprite):
         for atk in atks:
             if collide_rect(self, atk):
                 self.health.damage(atk.damage)
+                if self.health.playerHealth <= 0:
+                    self.health.playerHealth = 0
+                    return True
                 atk.kill()
+
+        return False
 
     def animate(self, pressed_keys):
         if self.state is not AS.ATTACK:
@@ -102,12 +108,7 @@ class Player(Sprite):
             elif self.vel_y > 0:
                 self.setState(AS.JUMPUP)
             else:
-                if (
-                    pressed_keys[K_a]
-                    or pressed_keys[K_LEFT]
-                    or pressed_keys[K_d]
-                    or pressed_keys[K_RIGHT]
-                ):
+                if pressed_keys[K_LEFT] or pressed_keys[K_RIGHT]:
                     self.setState(AS.MOVE)
 
         if self.current_anim_frame == self.animation_frames:
@@ -125,17 +126,17 @@ class Player(Sprite):
     def update(self, pressed_keys):
         self.apply_gravity()
 
-        self.checkDmg()
+        hasLost = self.checkDmg()
 
         self.animate(pressed_keys)
 
         if self.state not in [AS.ATTACK]:
-            if pressed_keys[K_LEFT] or pressed_keys[K_a]:
+            if pressed_keys[K_LEFT]:
                 self.move_x(False)
-            elif pressed_keys[K_RIGHT] or pressed_keys[K_d]:
+            elif pressed_keys[K_RIGHT]:
                 self.move_x(True)
 
-            if pressed_keys[K_UP] or pressed_keys[K_w]:
+            if pressed_keys[K_UP]:
                 self.jump()
 
             if not self.cooldown:
@@ -152,6 +153,8 @@ class Player(Sprite):
             if self.current_atk_frame == (self.atk_frames + self.atk_cooldown_frames):
                 self.cooldown = False
                 self.current_atk_frame = 0
+
+        return hasLost
 
     def draw(self, screen):
         screen.blit(self.image, self.rect)
