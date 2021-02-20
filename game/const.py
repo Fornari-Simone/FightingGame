@@ -1,3 +1,8 @@
+"""
+Utility constants
+"""
+
+
 class Color:
     BLACK = (0, 0, 0)
     WHITE = (255, 255, 255)
@@ -15,9 +20,11 @@ class Physics:
 class Game:
     ICON_PATH = "img/GameIcon.png"
     BG_PATH = "img/Background/Bleach.png"
+    GAUGE_PATH = "img/HealthBar/gauge.png"
+    LIFEBAR_PATH = "img/HealthBar/life.png"
     TITLE = "Fighting Game"
     SIZE = (800, 500)
     FPS = 60
-    INGAME = False
-    P1WIN = "P1"
-    P2WIN = "P2"
+    FONT = "Helvetica"
+    APP = "CBG"
+    VERSION = "01"

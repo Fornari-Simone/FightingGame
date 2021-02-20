@@ -1,20 +1,24 @@
 # region Imports
-from typing import Tuple, Union
+
 from datetime import datetime
+from typing import Union
 
 # endregion
 
 # region Constants
+
 APP_LEN = 3
 VER_LEN = 2
 NICK_LEN = 16
 TIME_LEN = 9
 MSG_LEN = 100
 PKT_LEN = APP_LEN + VER_LEN + NICK_LEN + TIME_LEN + MSG_LEN
+
 # endregion
 
 
 class Packet:
+    # region DocString
     """
     Represents a standard packet. If any of the attributes excedes its maximum an `Exception` is raised
 
@@ -33,22 +37,25 @@ class Packet:
         `bytes {bytes}`:
             `summary`: the packet divided in bytes
     """
+    # endregion
 
-    def __init__(self, *fields: Union[Tuple[str, str, str, str], Tuple[bytes]]) -> None:
+    def __init__(self, *fields: Union[tuple[str, str, str, str], tuple[bytes]]) -> None:
+        # region DocString
         """
         Creates a `Packet` object
 
         ### Arguments
-            `fields {Tuple[str, str, str, str] | Tuple[bytes]}`:
+            `fields {(str, str, str, str) | (bytes)}`:
                 `summary`: a tuple with either the four fields (APP, VER, NICK, MSG)\n
-                \t\tor the bytes representation of a preexisting packet.\n
-                \t\tThe TIME field is omitted since its automatically calculated inside the constructor\n
-                \t\tfor more precise latency calculations
+                or the bytes representation of a preexisting packet.\n
+                The TIME field is omitted since its automatically calculated inside the constructor\n
+                for more precise latency calculations
 
         ### Raises
             `Exception`: if any of the arguments are over their maximum length\n
-            \t\t\tor if wrong parameters are passed
+            or if wrong parameters are passed
         """
+        # endregion
 
         self.app = ""
         self.ver = ""
@@ -58,6 +65,7 @@ class Packet:
         self.bytes = b""
 
         # region If the single fields are passed
+
         if len(fields) == 4:
             self.app = Packet.__check(fields[0], APP_LEN, "APP")
             self.ver = Packet.__check(fields[1], VER_LEN, "VER")
@@ -72,9 +80,11 @@ class Packet:
             self.bytes = bytes(
                 self.app + self.ver + self.nick + self.time + self.msg, "utf-8"
             )
+
         # endregion
 
         # region If the byte representation is passed
+
         elif len(fields) == 1:
             if len(fields[0]) > PKT_LEN:
                 raise Exception(f"Invalid Buffer. Max is {PKT_LEN} bytes")
@@ -102,16 +112,20 @@ class Packet:
                     fields[0][APP_LEN + VER_LEN + NICK_LEN + TIME_LEN :],
                     encoding="utf-8",
                 )
+
         # endregion
 
         # region Otherwise
+
         else:
             raise Exception(
                 "Invalid Arguments. Must be (str, str, str, str) or (bytes)"
             )
+
         # endregion
 
     def __check(str: str, length: int, lbl: str) -> str:
+        # region DocString
         """
         Static method to check if a string isn't over the specified length and pads it to that length
 
@@ -129,6 +143,7 @@ class Packet:
         ### Raises
             `Exception`: if the string is too long
         """
+        # endregion
 
         if len(str) > length:
             raise Exception(f"{lbl} field is too long. Max is {length} characters")

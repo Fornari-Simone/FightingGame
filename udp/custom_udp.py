@@ -1,15 +1,17 @@
 # region Imports
+
 from socket import AF_INET, SOCK_DGRAM, socket
-from typing import Callable, Tuple
 from datetime import datetime
 from threading import Thread
-from packet import Packet
+from typing import Callable
+from udp.packet import Packet
 from re import match
 
 # endregion
 
 
 class UDP_P2P:
+    # region DocString
     """
     Class to handles p2p connections via the UDP protocol
 
@@ -25,8 +27,10 @@ class UDP_P2P:
         `sockRecv {socket}`:
             `summary`: the source socket
     """
+    # endregion
 
     def __init__(self, ipDest: str, sendPort: int, recvPort: int) -> None:
+        # region DocString
         """
         Creates a `UDP_P2P` object
 
@@ -38,6 +42,7 @@ class UDP_P2P:
             `recvPort {int}`:
                 `summary`: the source port
         """
+        # endregion
 
         self.ipDest = ipDest
         self.sendPort = sendPort
@@ -48,6 +53,7 @@ class UDP_P2P:
         self.stop_flag = False
 
     def transmission(self, app: str, ver: str, nick: str, msg: str) -> datetime:
+        # region DocString
         """
         Handles the transmission of a `Packet` object
 
@@ -64,6 +70,7 @@ class UDP_P2P:
         ### Raises
             `Exception`: if the packet is invalid (check the `Packet` class for more)
         """
+        # endregion
 
         try:
             p = Packet(
@@ -73,15 +80,16 @@ class UDP_P2P:
                 msg,
             )
             self.sockSend.sendto(p.bytes, (self.ipDest, self.sendPort))
-            return datetime.strptime(p.time + "000", "%H%M%S%f")
+            return datetime.strptime(f"{p.time}000", "%H%M%S%f")
         except Exception as e:
             raise e
 
     def receptionThread(
         self,
-        f: Callable[[Packet, Tuple[str, int]], None],
+        f: Callable[[Packet, tuple[str, int]], None],
         onErr: Callable[[Exception], None],
     ) -> Thread:
+        # region DocString
         """
         Creates a `Thread` object that runs the reception method
 
@@ -90,12 +98,13 @@ class UDP_P2P:
                 `summary`: a function to handle the received data (data, (address, port))
             `onErr {function (Exception): None}`:
                 `summary`: a function to handle the raise of an exception
-    
-i
+
         ### Returns
             `Thread`: the thread that runs the reception method with `f` and `onErr` as arguments.\n
-            \t\tThe thread is a deamon
+            The thread is a deamon
         """
+        # endregion
+
         self.stop_flag = False
 
         t = Thread(target=self.reception, args=(f, onErr, lambda: self.stop_flag))
@@ -104,10 +113,11 @@ i
 
     def reception(
         self,
-        f: Callable[[Packet, Tuple[str, int], datetime], None],
+        f: Callable[[Packet, tuple[str, int], datetime], None],
         onErr: Callable[[Exception], None],
         stop: Callable[[], bool],
     ) -> None:
+        # region DocString
         """
         Handles the reception of data with an infinite loop when the method is called
 
@@ -118,8 +128,9 @@ i
                 `summary`: a function to handle the raise of an exception
             `stop {function (): bool}`:
                 `summary`: a function to stop the loop. If returns true the cycle is interrupted\n
-                \t\tand the source socket is closed, otherwise the cycle continues
+                and the source socket is closed, otherwise the cycle continues
         """
+        # endregion
 
         while True:
             if stop():
@@ -135,36 +146,62 @@ i
 
         self.__closeSockRecv()
 
-    def singleReceive(self):
-        data, addr = self.sockRecv.recvfrom(130)
-        time = datetime.now().strftime("%H%M%S%f")
-        data = Packet(data)
-        return (data, addr, datetime.strptime(time, "%H%M%S%f"))
+    def singleReceive(self, timeout: float) -> tuple[Packet, tuple[str, int], str]:
+        # region DocString
+        """
+        A method to receive a single message.
+
+        ### Arguments
+            `timeout {float}`:
+                `summary`: the number of seconds to wait for the message
+
+        ### Returns
+            `(Packet, (str, int), str)`: the data received together with the address of the source\n
+            and the time of the reception
+        """
+        # endregion
+
+        self.sockRecv.settimeout(timeout)
+        try:
+            data, addr = self.sockRecv.recvfrom(130)
+            time = datetime.now().strftime("%H%M%S%f")
+            data = Packet(data)
+            self.sockRecv.settimeout(None)
+            return (data, addr, datetime.strptime(time, "%H%M%S%f"))
+        except:
+            return (None, None, None)
 
     def stopThread(self) -> None:
+        # region DocString
         """
         A method to stop a running thread from `receptionThread`
         """
+        # endregion
 
         self.stop_flag = True
 
     def closeSockSend(self) -> None:
+        # region DocString
         """
         A method to close the destination socket
         """
+        # endregion
 
         self.sockSend.close()
 
     def __closeSockRecv(self) -> None:
+        # region DocString
         """
         A method to close the source socket.\n
         You shouldn't use this method since its automatically called\n
         at the end of the cycle in the `reception` method
         """
+        # endregion
 
         self.sockRecv.close()
 
     def latency(t1: datetime, t2: datetime) -> int:
+        # region DocString
         """
         A static utility method that calculates the difference in milliseconds between two times
 
@@ -177,10 +214,12 @@ i
         ### Returns
             `int`: the number of milliseconds between the two times
         """
+        # endregion
 
         return int((t1 - t2).total_seconds() * 1000)
 
     def checkIP(ip: str) -> bool:
+        # region DocString
         """
         A static utility method to check if an ip in valid
 
@@ -191,6 +230,7 @@ i
         ### Returns
             `bool`: True if the ip is valid, False otherwise
         """
+        # endregion
 
         return match(
             r"^((1?[0-9]{1,2}|2[0-4][0-9]|25[0-5])\.){3}(1?[0-9]{1,2}|2[0-4][0-9]|25[0-5])$",
