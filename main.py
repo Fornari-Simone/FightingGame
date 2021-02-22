@@ -1,5 +1,12 @@
 # region Imports
 
+try:
+    import pygame
+except ImportError:
+    import os
+
+    os.system("python -m pip install pygame")
+
 from pygame.display import set_caption, set_icon, set_mode, flip
 from pygame.constants import K_LEFT, K_RIGHT, K_UP, K_z, K_x
 from game.player.Player import Ichigo, Player, Vegeth
