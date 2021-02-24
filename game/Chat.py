@@ -17,7 +17,7 @@ class Chat:
     Creates the main window of the chat
     """
 
-    def __init__(self, ip, nick) -> None:
+    def __init__(self, ip, nick, udp) -> None:
 
         # region Root creation
         self.root = Tk()
@@ -47,8 +47,8 @@ class Chat:
         self.enterBtn.pack(side=LEFT)
         # endregion
 
-        self.udpp2p = UDP_P2P(self.ipDest, 6000, 6000)  # creates the UDP class
-
+        #self.udpp2p = UDP_P2P(self.ipDest, 6000, 6000)  # creates the UDP class
+        self.udpp2p = udp
         self.t = self.udpp2p.receptionThread(
             self.__receive, lambda _: ()
         )  # initialize the reception thread
@@ -86,7 +86,7 @@ class Chat:
 
         if len(self.message.get().strip()) > 0:
             try:
-                self.udpp2p.transmission("APP", "1", self.username, self.message.get())
+                self.udpp2p.transmission("CHA", "01", self.username, self.message.get())
 
                 self.__addMsg(f"\n(YOU): {self.message.get().strip()}")
                 self.message.delete(0, END)

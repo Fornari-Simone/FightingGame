@@ -158,7 +158,8 @@ Public IP:  {urllib.request.urlopen('https://ident.me').read().decode('utf8')}""
 
                     # endregion
 
-        except:
+        except Exception as e:
+            print(e)
             pass
         finally:
             self.root.wm_deiconify()
