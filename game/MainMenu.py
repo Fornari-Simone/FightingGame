@@ -132,6 +132,8 @@ Public IP:  {urllib.request.urlopen('https://ident.me').read().decode('utf8')}""
 
                     # endregion
 
+                    chat = Chat(self.ipDest, rdata.nick, udp, self)
+
                     # region Start pygame loop
 
                     gamestate = self.gameloop(
@@ -140,7 +142,7 @@ Public IP:  {urllib.request.urlopen('https://ident.me').read().decode('utf8')}""
                         self.username,
                         rdata.msg,
                         rdata.nick,
-                        udp,
+                        udp,chat
                     )
 
                     # endregion

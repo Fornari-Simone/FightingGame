@@ -124,7 +124,7 @@ def rcvErr(e: Exception) -> None:
 
 
 def gameloop(
-    playerOrder: bool, p1Char: str, nick1: str, p2Char: str, nick2: str, udp: UDP_P2P
+    playerOrder: bool, p1Char: str, nick1: str, p2Char: str, nick2: str, udp: UDP_P2P, chat
 ) -> str:
     # region DocString
     """
@@ -178,8 +178,6 @@ def gameloop(
         pl2 = Vegeth(not playerOrder, nick2, all_sprites)
 
     # endregion
-
-    chat = Chat(udp.ipDest, nick2, udp)
 
     rcvT = udp.receptionThread(
         lambda data, addr, port, time: rcv(pl2, data, addr, port, time, chat), rcvErr

@@ -17,10 +17,10 @@ class Chat:
     Creates the main window of the chat
     """
 
-    def __init__(self, ip, nick, udp) -> None:
+    def __init__(self, ip, nick, udp, master) -> None:
 
         # region Root creation
-        self.root = Tk()
+        self.root = Tk(master)
         self.root.geometry("700x412")  # set the windows' dimensions
         self.root.resizable(0, 0)  # disable the resizing of the window
         self.root.title("Chat")  # set the title of the window
