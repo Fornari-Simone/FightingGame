@@ -1,5 +1,5 @@
 # region Imports
-from tkinter import Tk, LEFT, TOP, messagebox, END, Label
+from tkinter import Toplevel, LEFT, TOP, messagebox, END, Label
 from tkinter.constants import DISABLED, NORMAL, X
 from tkinter.scrolledtext import ScrolledText
 from tkinter.simpledialog import Dialog
@@ -20,7 +20,7 @@ class Chat:
     def __init__(self, ip, nick, udp, master) -> None:
 
         # region Root creation
-        self.root = Tk(master)
+        self.root = Toplevel(master)
         self.root.geometry("700x412")  # set the windows' dimensions
         self.root.resizable(0, 0)  # disable the resizing of the window
         self.root.title("Chat")  # set the title of the window
@@ -60,23 +60,6 @@ class Chat:
 
         self.root.mainloop()
 
-    def __input(self) -> None:
-        """
-        Shows an `InputDialog` to get user input.\n
-        If the input is invalid the function is recalled.
-        """
-
-        self.username, self.ipDest = InputDialog(self.root).result
-
-        if not self.username or len(self.username) > NICK_LEN:
-            messagebox.showerror(
-                "Input Error", "Invalid Username. Max size is 16 characters"
-            )
-            self.__input()
-
-        if not UDP_P2P.checkIP(self.ipDest):
-            messagebox.showerror("Input Error", "Invalid IP")
-            self.__input()
 
     def __send(self) -> None:
         """
@@ -139,37 +122,3 @@ class Chat:
         self.udpp2p.stopThread()
         self.root.destroy()
 
-
-class InputDialog(Dialog):
-    """
-    Creates an input dialog with two `Entry` widgets, one for the username and one for the destination IP
-    """
-
-    def body(self, master: Tk) -> Entry:
-        """
-        Handles the creation of the widgets in the window
-
-        ### Arguments
-            `master {Tk}`:
-                `summary`: the parent window
-
-        ### Returns
-            `Entry`: the focused widget
-        """
-
-        Label(master, text="Username:").grid(row=0)
-        Label(master, text="Connect to IP:").grid(row=1)
-
-        self.e1 = Entry(master)
-        self.e1.grid(row=0, column=1)
-        self.e2 = Entry(master)
-        self.e2.grid(row=1, column=1)
-
-        return self.e1
-
-    def apply(self) -> None:
-        """
-        Implemented method to load the result of the input
-        """
-
-        self.result = [self.e1.get(), self.e2.get()]

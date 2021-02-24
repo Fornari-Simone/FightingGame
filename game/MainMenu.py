@@ -10,6 +10,7 @@ from udp.packet import NICK_LEN
 from datetime import datetime
 from threading import Thread
 from game.const import Game
+from game.Chat import Chat
 import urllib.request
 import socket
 
@@ -132,7 +133,7 @@ Public IP:  {urllib.request.urlopen('https://ident.me').read().decode('utf8')}""
 
                     # endregion
 
-                    chat = Chat(self.ipDest, rdata.nick, udp, self)
+                    chat = Chat(self.ipDest, rdata.nick, udp, self.root)
 
                     # region Start pygame loop
 
