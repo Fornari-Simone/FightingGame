@@ -23,6 +23,7 @@ from pygame.time import Clock
 from pygame import init, quit
 from pygame.event import get
 from typing import Sequence
+from game.Chat import Chat
 
 # endregion
 
@@ -75,7 +76,7 @@ def snd(nick: str, msg: str, udp: UDP_P2P) -> None:
     udp.transmission(Game.APP, Game.VERSION, nick, msg)
 
 
-def rcv(pl: Player, data: Packet, addr: str, port: int) -> None:
+def rcv(pl: Player, data: Packet, addr: str, port: int, time, chat) -> None:
     # region DocString
     """
     Function to receive data.
@@ -95,13 +96,17 @@ def rcv(pl: Player, data: Packet, addr: str, port: int) -> None:
     # endregion
 
     global gamestate
-    if data.msg == "Lost":
-        gamestate = "Win"
-    elif data.msg == "Quit":
-        gamestate = "Quitted"
-    else:
-        keys = eval(data.msg)
-        pl.update(keys)
+
+    if data.app == "CHA":
+        chat.__receive(data, addr, time)
+    elif data.app == "CBG":
+        if data.msg == "Lost":
+            gamestate = "Win"
+        elif data.msg == "Quit":
+            gamestate = "Quitted"
+        else:
+            keys = eval(data.msg)
+            pl.update(keys)
 
 
 def rcvErr(e: Exception) -> None:
@@ -174,8 +179,10 @@ def gameloop(
 
     # endregion
 
+    chat = Chat(udp.ipDest, nick2, udp)
+
     rcvT = udp.receptionThread(
-        lambda data, addr, port: rcv(pl2, data, addr, port), rcvErr
+        lambda data, addr, port, time: rcv(pl2, data, addr, port, time, chat), rcvErr
     )
     rcvT.start()
 
