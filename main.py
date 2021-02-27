@@ -4,8 +4,8 @@ try:
     import pygame
 except ImportError:
     import os
-
     os.system("python -m pip install pygame")
+    import pygame
 
 from pygame.display import set_caption, set_icon, set_mode, flip
 from pygame.constants import K_LEFT, K_RIGHT, K_UP, K_z, K_x
@@ -155,7 +155,7 @@ def gameloop(
 
     # region Screen setup
 
-    screen = set_mode(Game.SIZE)
+    screen = set_mode(Game.SIZE[0] + 200, Game.SIZE[1])
     set_caption(Game.TITLE)
     set_icon(load(Game.ICON_PATH))
     bg = load(Game.BG_PATH).convert_alpha()
