@@ -1,84 +1,128 @@
-# region Imports
-from tkinter import Toplevel, LEFT, TOP, messagebox, END, Label
-from tkinter.constants import DISABLED, NORMAL, X
-from tkinter.scrolledtext import ScrolledText
-from tkinter.simpledialog import Dialog
-from tkinter.ttk import Entry, Button
-from udp.packet import NICK_LEN, Packet
+# region imports
+
+from pygame_gui.core.interfaces.manager_interface import IUIManagerInterface
+from pygame_gui.elements import UITextBox, UITextEntryLine, UIButton
+from pygame_gui import UI_BUTTON_PRESSED, UI_TEXT_ENTRY_FINISHED
+from pygame_gui.core.ui_container import UIContainer
+from pygame import Rect, USEREVENT
 from udp.custom_udp import UDP_P2P
+from typing import Tuple, Union
+from pygame.event import Event
+from udp.packet import Packet
 from datetime import datetime
-from typing import Tuple
+from game.const import Game
 
 # endregion
 
 
-class Chat:
+class Chat(UIContainer):
+    # region Docstring
     """
-    Creates the main window of the chat
+    Class to display the game chat
     """
+    # endregion
 
-    def __init__(self, ip, nick, udp, master) -> None:
+    def __init__(
+        self,
+        size: tuple[int, int],
+        manager: IUIManagerInterface,
+        udp: UDP_P2P,
+        username: str,
+    ) -> None:
+        # region Docstring
+        """
+        Creates a `Chat` object
 
-        # region Root creation
-        self.root = Toplevel(master)
-        self.root.geometry("700x412")  # set the windows' dimensions
-        self.root.resizable(0, 0)  # disable the resizing of the window
-        self.root.title("Chat")  # set the title of the window
+        ### Arguments
+            `size {(int, int)}`:
+                `summary`: the size of the chat window
+            `manager {UIManager}`:
+                `summary`: the UIManager that manages this element.
+            `udp {UDP_P2P}`:
+                `summary`: the udp object
+            `username {str}`:
+                `summary`: the username of this host
+        """
+        # endregion
+        super().__init__(relative_rect=Rect((Game.SIZE[0], 0), size), manager=manager)
+
+        # region Element creation
+
+        self.textbox = UITextBox(
+            html_text="",
+            relative_rect=Rect((0, 0), (size[0], size[1] - 25)),
+            manager=manager,
+            container=self,
+        )
+
+        self.entryline = UITextEntryLine(
+            relative_rect=Rect((0, size[1] - 28), (size[0] - 50, 20)),
+            manager=manager,
+            container=self,
+        )
+        self.entryline.set_text_length_limit(100)
+
+        self.enterbtn = UIButton(
+            text="Enter",
+            relative_rect=Rect((size[0] - 50, size[1] - 28), (50, 30)),
+            manager=manager,
+            container=self,
+        )
+
         # endregion
 
-        self.ipDest = ip
-        self.username = nick
+        self.record = ""
+        self.size = size
+        self.udp = udp
+        self.username = username
 
-        #self.root.withdraw()  # makes the window invisible
-        #self.__input()  # handles the user input
-        #self.root.wm_deiconify()  # makes the window reappear
+    def process_event(self, event: Event) -> Union[bool, None]:
+        # region Docstring
+        """
+        Overridden method to handle the gui events
 
-        # region Widget creation
-        self.record = ScrolledText(self.root, state=DISABLED)
-        self.record.pack(side=TOP, fill=X)
+        ### Arguments
+            `event {Event}`:
+                `summary`: the fired event
 
-        self.message = Entry(self.root, width=100)
-        self.message.bind(
-            "<Return>", lambda _: self.__send()
-        )  # bind the send function with the enter key
-        self.message.pack(side=LEFT)
-
-        self.enterBtn = Button(self.root, text="ENTER", command=self.__send, width=15)
-        self.enterBtn.pack(side=LEFT)
+        ### Returns
+            `bool | None`: return if the event has been handled
+        """
         # endregion
 
-        #self.udpp2p = UDP_P2P(self.ipDest, 6000, 6000)  # creates the UDP class
-        self.udpp2p = udp
-        self.t = self.udpp2p.receptionThread(
-            self.__receive, lambda _: ()
-        )  # initialize the reception thread
-        self.t.start()
+        handled = super().process_event(event)
+        if event.type != USEREVENT:
+            return
 
-        self.root.protocol(
-            "WM_DELETE_WINDOW", self.__onWindowClose
-        )  # intercepts the window closing
+        if (
+            event.user_type == UI_TEXT_ENTRY_FINISHED
+            and event.ui_element == self.entryline
+        ) or (
+            event.user_type == UI_BUTTON_PRESSED and event.ui_element == self.enterbtn
+        ):
+            self.__send()
+            handled = True
 
-        self.root.mainloop()
-
+        return handled
 
     def __send(self) -> None:
+        # region Docstring
         """
-        Handles the press of the enter `Button`, sending the user message.\n
-        If an error occurs an error dialog shows up
+        Handles the press of the enter `UIButton`, sending the user message.\n
         """
+        # endregion
 
-        if len(self.message.get().strip()) > 0:
-            try:
-                self.udpp2p.transmission("CHA", "01", self.username, self.message.get())
+        if len(self.entryline.get_text().strip()) > 0:
+            self.udp.transmission(
+                "CHA", "01", self.username, self.entryline.get_text().strip()
+            )
+            self.__addmsg(f"<b>(YOU): </b><br>{self.entryline.get_text().strip()}<br>")
+            self.entryline.set_text("")
 
-                self.__addMsg(f"\n(YOU): {self.message.get().strip()}")
-                self.message.delete(0, END)
-            except Exception as e:
-                messagebox.showerror("Input Error", e)
-
-    def __receive(self, data: Packet, addr: Tuple[str, int], time: datetime) -> None:
+    def receive(self, data: Packet, addr: Tuple[str, int], time: datetime) -> None:
+        # region Docstring
         """
-        Callback function for the reception thread that handles the received data, address and time of reception
+        Method that handles the received data, address and time of reception
 
         ### Arguments
             `data {Packet}`:
@@ -89,36 +133,51 @@ class Chat:
             `time {datetime}`:
                 `summary`: the time of the packet reception
         """
+        # endregion
 
         n = UDP_P2P.latency(
             datetime.strptime(time.strftime("%H%M%S%f"), "%H%M%S%f"),
             datetime.strptime(data.time + "000", "%H%M%S%f"),
         )
 
-        self.__addMsg(
-            f"\n(Username: {data.nick.strip()} - Address: {addr[0]} - Latency: {n}ms):\n{data.msg.strip()}"
-        )
+        self.record += f"<b>({data.nick.strip()} - {addr[0]} - {n}ms): </b><br>{data.msg.strip()}<br>"
 
-    def __addMsg(self, msg: str) -> None:
+    def update(self, time_delta: float) -> None:
+        # region Docstring
         """
-        Utility function to add text to the disabled `ScrolledText` area and scrolls down
+        Overridden method to update the element
+
+        ### Arguments
+            `time_delta {float}`:
+                `summary`: the time passed between frames, measured in seconds.
+        """
+        # endregion
+
+        super().update(time_delta)
+        if self.record != self.textbox.html_text:
+            self.textbox.kill()
+            self.textbox = UITextBox(
+                html_text=self.record,
+                relative_rect=Rect((0, 0), (self.size[0], self.size[1] - 25)),
+                container=self,
+                manager=self.ui_manager,
+            )
+
+    def __addmsg(self, msg: str) -> None:
+        # region Docstring
+        """
+        Method to insert text in the `UITextBox` element
 
         ### Arguments
             `msg {str}`:
-                `summary`: the string to insert
+                `summary`: the text to insert
         """
-
-        self.record.configure(state=NORMAL)
-        self.record.insert(END, msg)
-        self.record.configure(state=DISABLED)
-        self.record.see(END)
-
-    def __onWindowClose(self):
-        """
-        Handles the closing of the main window to close the sending socket and to stop the reception thread
-        """
-
-        self.udpp2p.closeSockSend()
-        self.udpp2p.stopThread()
-        self.root.destroy()
-
+        # endregion
+        self.record += msg
+        self.textbox.kill()
+        self.textbox = UITextBox(
+            html_text=self.record,
+            relative_rect=Rect((0, 0), (self.size[0], self.size[1] - 25)),
+            container=self,
+            manager=self.ui_manager,
+        )

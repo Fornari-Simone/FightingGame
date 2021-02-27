@@ -1,8 +1,8 @@
 # region Imports
 
 from game.player.Animations import Animation, AnimationStates as AS
-from pygame.locals import K_LEFT, K_RIGHT, K_UP, K_z  # , K_x
 from pygame.sprite import Group, Sprite, collide_rect
+from pygame.locals import K_LEFT, K_RIGHT, K_UP, K_z
 from game.const import Physics, Game, Color
 from game.player.HealthBar import HealthBar
 from pygame.surface import Surface
@@ -147,13 +147,6 @@ class Player(Sprite):
         # endregion
         pass
 
-    # @abstractmethod
-    # def charged_attack(self) -> None:
-    #     """
-    #     Method to make the player do a charged attack
-    #     """
-    #     pass
-
     def checkDmg(self) -> bool:
         # region DocString
         """
@@ -255,8 +248,6 @@ class Player(Sprite):
             if not self.cooldown:
                 if pressed_keys[K_z]:
                     self.standard_attack()
-                # if pressed_keys[K_x]:
-                #     self.charged_attack()
 
         # endregion
 
@@ -276,6 +267,10 @@ class Player(Sprite):
         self.animate(pressed_keys)
 
         return self.checkDmg()
+    
+    def reposition(self, coords: tuple[int, int]):
+        self.rect.x = coords[0]
+        self.rect.y = coords[1]
 
     def draw(self, screen: Surface) -> None:
         # region DocString
@@ -359,8 +354,6 @@ class Ichigo(Player):
 
         # endregion
 
-    # def charged_attack(self):
-    #     pass
 
 
 class Vegeth(Player):
@@ -433,8 +426,6 @@ class Vegeth(Player):
 
         # endregion
 
-    # def charged_attack(self):
-    #     pass
 
 
 class Attack(Sprite):

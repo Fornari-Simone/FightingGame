@@ -2,9 +2,9 @@
 
 from socket import AF_INET, SOCK_DGRAM, socket
 from datetime import datetime
+from udp.packet import Packet
 from threading import Thread
 from typing import Callable
-from udp.packet import Packet
 from re import match
 
 # endregion
@@ -86,7 +86,7 @@ class UDP_P2P:
 
     def receptionThread(
         self,
-        f: Callable[[Packet, tuple[str, int]], None],
+        f: Callable[[Packet, tuple[str, int], datetime], None],
         onErr: Callable[[Exception], None],
     ) -> Thread:
         # region DocString
@@ -122,8 +122,8 @@ class UDP_P2P:
         Handles the reception of data with an infinite loop when the method is called
 
         ### Arguments
-            `f {function (Packet, (str, int)): None}`:
-                `summary`: a function to handle the received data (data, (address, port))
+            `f {function (Packet, (str, int), datetime): None}`:
+                `summary`: a function to handle the received data (data, (address, port), time)
             `onErr {function (Exception): None}`:
                 `summary`: a function to handle the raise of an exception
             `stop {function (): bool}`:

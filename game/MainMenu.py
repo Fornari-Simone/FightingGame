@@ -159,7 +159,7 @@ Public IP:  {urllib.request.urlopen('https://ident.me').read().decode('utf8')}""
                     # endregion
 
         except Exception as e:
-            print(e)
+            print(e.with_traceback())
             pass
         finally:
             self.root.wm_deiconify()
@@ -201,6 +201,7 @@ Public IP:  {urllib.request.urlopen('https://ident.me').read().decode('utf8')}""
                 "Input Error", "Invalid Username. Max size is 16 characters"
             )
             self.__input()
+            return
 
         # endregion
 
@@ -209,6 +210,7 @@ Public IP:  {urllib.request.urlopen('https://ident.me').read().decode('utf8')}""
         if not UDP_P2P.checkIP(self.ipDest):
             messagebox.showerror("Input Error", "Invalid IP")
             self.__input()
+            return
 
         # endregion
 
